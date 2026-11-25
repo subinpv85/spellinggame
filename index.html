@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Reception Spelling Fun!</title>
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --success: #4CAF50;
+      --error: #FF5252;
+      --bg: #F0F7FF;
+      --card: #FFFFFF;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .score-badge {
+      background: #FFD54F;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 3px 0 #FFA000;
+    }
+
+    .progress-badge {
+      background: #E1F5FE;
+      color: #0277BD;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .parent-btn {
+      background: #E0E0E0;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #555;
+    }
+
+    .game-card {
+      background: var(--card);
+      width: 100%;
+      max-width: 800px;
+      border-radius: 24px;
+      padding: 25px 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .picture-area {
+      width: 180px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      background: #F9FBFD;
+      border-radius: 20px;
+      border: 3px dashed #D0E2F5;
+      overflow: hidden;
+    }
+
+    .picture-area img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .emoji-pic {
+      font-size: 110px;
+      line-height: 1;
+    }
+
+    .slots-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 15px 0 20px 0;
+    }
+
+    .letter-slot {
+      width: 65px;
+      height: 75px;
+      border: 4px solid #B0C4DE;
+      border-radius: 16px;
+      font-size: 2.8rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #FFF;
+      text-transform: lowercase;
+      transition: all 0.2s;
+    }
+
+    .letter-slot.active {
+      border-color: var(--primary);
+      background: #EBF5FF;
+      transform: scale(1.06);
+    }
+
+    .letter-slot.filled {
+      border-color: var(--success);
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .letter-slot.error {
+      border-color: var(--error);
+      background: #FFEBEE;
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-8px); }
+    }
+
+    .feedback-msg {
+      min-height: 36px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .feedback-error { color: var(--error); }
+    .feedback-success { color: var(--success); }
+
+    .keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 720px;
+    }
+    .kb-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .key-btn {
+      flex: 1;
+      max-width: 60px;
+      height: 58px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      font-family: inherit;
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 12px;
+      box-shadow: 0 4px 0 #94A3B8;
+      cursor: pointer;
+      color: #1E293B;
+      text-transform: lowercase;
+    }
+
+    .key-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #94A3B8;
+      background: #E2E8F0;
+    }
+
+    .next-btn {
+      display: none;
+      background: var(--success);
+      color: white;
+      border: none;
+      padding: 15px 35px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #2E7D32;
+      margin-top: 10px;
+    }
+
+    .tv-thief-overlay {
+      position: fixed;
+      bottom: 20px;
+      left: -400px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .tv-thief-overlay.run-away {
+      animation: stealTvAnimation 3.2s ease-in-out forwards;
+    }
+
+    .speech-bubble {
+      background: #FFEB3B;
+      color: #D32F2F;
+      border: 4px solid #D32F2F;
+      border-radius: 20px;
+      padding: 10px 18px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 12px 12px 0;
+      border-style: solid;
+      border-color: #D32F2F transparent transparent transparent;
+    }
+
+    .thief-character {
+      font-size: 85px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: waddle 0.25s infinite alternate;
+    }
+
+    @keyframes waddle {
+      from { transform: rotate(-6deg) translateY(0); }
+      to { transform: rotate(6deg) translateY(-6px); }
+    }
+
+    @keyframes stealTvAnimation {
+      0% { left: -350px; }
+      25% { left: calc(50% - 140px); }
+      65% { left: calc(50% - 140px); }
+      100% { left: 110vw; }
+    }
+
+    .licence-card {
+      background: linear-gradient(135deg, #FFFDF0 0%, #FFF3CD 100%);
+      border: 8px double #D4AF37;
+      border-radius: 24px;
+      padding: 25px 20px;
+      text-align: center;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+      position: relative;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .licence-header {
+      background: #1B5E20;
+      color: #FFD54F;
+      padding: 8px 15px;
+      border-radius: 12px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .licence-tv-icon {
+      font-size: 80px;
+      margin: 10px 0;
+    }
+
+    .licence-stamp {
+      display: inline-block;
+      border: 4px solid #2E7D32;
+      color: #2E7D32;
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 6px 16px;
+      border-radius: 10px;
+      transform: rotate(-5deg);
+      margin: 12px 0;
+      background: rgba(255,255,255,0.7);
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 400;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      z-index: 300;
+    }
+
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 20px;
+      padding: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 240px;
+      margin: 15px auto;
+    }
+
+    .pin-btn {
+      padding: 15px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      border: 2px solid #CBD5E1;
+      border-radius: 12px;
+      background: #F8FAFC;
+      cursor: pointer;
+    }
+
+    .pin-btn:active {
+      background: #E2E8F0;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #CCC;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .word-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid #EEE;
+    }
+
+    .del-btn {
+      background: #FF5252;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .add-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .rwi-btn {
+      background: #8E24AA;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      box-shadow: 0 3px 0 #5E1473;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <header>
+    <div class="score-badge">⭐ Stars: <span id="stars">0</span></div>
+    <div class="progress-badge" id="progressBadge">Word 1 of 6</div>
+    <button class="parent-btn" onclick="requestParentAccess()">🔒 Parent Setup</button>
+  </header>
+
+  <div class="game-card">
+    <div class="picture-area" id="pictureArea"></div>
+    <div class="slots-container" id="slotsContainer"></div>
+    <div class="feedback-msg" id="feedbackMsg"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextWord()">Next Word ➡️</button>
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+
+  <!-- Cartoon TV Thief Animation Character -->
+  <div class="tv-thief-overlay" id="tvThief">
+    <div class="speech-bubble" id="thiefBubble">🚨 No TV licence for you!</div>
+    <div class="thief-character">🏃‍♂️💨📺</div>
+  </div>
+
+  <!-- Official TV Licence Celebration Modal -->
+  <div class="modal" id="licenceModal">
+    <div class="licence-card">
+      <div class="licence-header">🇬🇧 OFFICIAL TV LICENCE 🇬🇧</div>
+      <div class="licence-tv-icon">📺🏆</div>
+      <h2 id="licenceAwardTitle" style="margin: 5px 0; color: #1B5E20;">Super Speller Award!</h2>
+      <p style="font-size: 1.1rem; color: #333; margin: 8px 0;">
+        You spelled all <strong id="totalWordsCount">6</strong> words and earned <strong id="finalStarsCount">6</strong> stars!
+      </p>
+      <div class="licence-stamp">✅ APPROVED FOR TELLY TIME</div>
+      <button class="add-btn" style="background: #4CAF50; font-size: 1.3rem; margin-top: 15px;" onclick="restartGame()">Play Again 🔄</button>
+    </div>
+  </div>
+
+  <!-- Parent PIN Lock Modal -->
+  <div class="modal" id="pinModal">
+    <div class="modal-content" style="max-width: 340px; text-align: center;">
+      <h3>🔒 Enter Parent PIN</h3>
+      <p style="font-size: 0.85rem; color: #666; margin-top: -8px;">(Default PIN is 1234)</p>
+      <div id="pinDisplay" style="font-size: 2rem; letter-spacing: 10px; font-weight: bold; min-height: 40px; margin: 10px 0; color: #333;">____</div>
+      <div id="pinErrorMsg" style="color: #FF5252; font-weight: bold; min-height: 22px; font-size: 0.9rem;"></div>
+      <div class="pin-grid">
+        <button class="pin-btn" onclick="pressPinDigit('1')">1</button>
+        <button class="pin-btn" onclick="pressPinDigit('2')">2</button>
+        <button class="pin-btn" onclick="pressPinDigit('3')">3</button>
+        <button class="pin-btn" onclick="pressPinDigit('4')">4</button>
+        <button class="pin-btn" onclick="pressPinDigit('5')">5</button>
+        <button class="pin-btn" onclick="pressPinDigit('6')">6</button>
+        <button class="pin-btn" onclick="pressPinDigit('7')">7</button>
+        <button class="pin-btn" onclick="pressPinDigit('8')">8</button>
+        <button class="pin-btn" onclick="pressPinDigit('9')">9</button>
+        <button class="pin-btn" style="background: #FFEBEE; color: #D32F2F;" onclick="clearPin()">C</button>
+        <button class="pin-btn" onclick="pressPinDigit('0')">0</button>
+        <button class="pin-btn" style="background: #E2E8F0;" onclick="closePinModal()">✖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Setup Modal -->
+  <div class="modal" id="parentModal">
+    <div class="modal-content">
+      <h2>Parent Setup</h2>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <div class="form-group" style="flex: 2; background: #F0F7FF; padding: 10px; border-radius: 10px; border: 2px solid #B0C4DE; margin-bottom: 0;">
+          <label>Child's Name:</label>
+          <input type="text" id="childNameInput" placeholder="e.g. Leo">
+        </div>
+        <div class="form-group" style="flex: 1; background: #FFF8E1; padding: 10px; border-radius: 10px; border: 2px solid #FFE082; margin-bottom: 0;">
+          <label>Parent PIN:</label>
+          <input type="text" id="parentPinInput" maxlength="4" placeholder="1234">
+        </div>
+      </div>
+
+      <!-- Read Write Inc. Book & Pack Selector -->
+      <div class="form-group" style="background: #F3E5F5; padding: 12px; border-radius: 12px; border: 2px solid #CE93D8; margin-bottom: 15px;">
+        <label style="color: #6A1B9A;">📚 Read Write Inc. (Oxford) Books & Packs:</label>
+        <select id="rwiBookSelect">
+          <optgroup label="Sound Blending Books (1–10)">
+            <option value="book1">Book 1: m, a, s, d, t, i, n, p, g, o</option>
+            <option value="book2">Book 2: c, k, u, b</option>
+            <option value="book3">Book 3: f, e, l, h</option>
+            <option value="book4">Book 4: r, j, v, y, w</option>
+            <option value="book5">Book 5: z, x, ff, ll, ss, zz</option>
+            <option value="book6">Book 6: Special Friends (sh, ck)</option>
+            <option value="book7">Book 7: Special Friends (th, ch, ng, nk)</option>
+            <option value="book8">Book 8: 4-Letter Blends (CCVC)</option>
+            <option value="book9">Book 9: 4-Letter Blends (CVCC)</option>
+            <option value="book10">Book 10: Blends with Special Friends</option>
+          </optgroup>
+          <optgroup label="Book Bag Books & Red Words">
+            <option value="specialFriends">Set 1: Special Friends (sh, ch, th, ng, nk)</option>
+            <option value="set2Vowels">Set 2: Long Vowels (ay, ee, igh, ow, oo)</option>
+            <option value="redWords">RWI Red Words (Tricky Reception Words)</option>
+          </optgroup>
+        </select>
+        <button class="rwi-btn" onclick="loadSelectedRwiBook()">Load Selected Pack Words</button>
+      </div>
+
+      <p style="font-size: 0.9rem; color: #666; margin-top: 0;">Or add custom words using an emoji OR a photo from your device:</p>
+
+      <div class="form-group">
+        <label>Word to Spell:</label>
+        <input type="text" id="newWordInput" placeholder="e.g. cat">
+      </div>
+
+      <div class="form-group">
+        <label>Option A: Type/Paste an Emoji:</label>
+        <input type="text" id="newEmojiInput" placeholder="e.g. 🐱">
+      </div>
+
+      <div class="form-group">
+        <label>Option B: Or Pick a Picture File:</label>
+        <input type="file" id="newImageInput" accept="image/*">
+      </div>
+
+      <button class="add-btn" onclick="addNewWord()">+ Add Word to Game</button>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+        <h3 style="margin: 0;">Current Word List</h3>
+        <button class="del-btn" style="font-size: 0.85rem;" onclick="clearAllWords()">Clear All</button>
+      </div>
+      <div id="wordListContainer" style="margin-top: 8px;"></div>
+
+      <button class="add-btn" style="background: #555; margin-top: 15px;" onclick="closeParentModal()">Done & Save</button>
+    </div>
+  </div>
+  <script>
+    const defaultWords = [
+      { word: "cat", type: "emoji", value: "🐱" },
+      { word: "dog", type: "emoji", value: "🐶" },
+      { word: "sun", type: "emoji", value: "☀️" },
+      { word: "pig", type: "emoji", value: "🐷" },
+      { word: "bus", type: "emoji", value: "🚌" },
+      { word: "frog", type: "emoji", value: "🐸" }
+    ];
+
+    const funnyErrorMessages = [
+      "🚨 No TV licence for you!",
+      "📺 Taking the telly! No licence!",
+      "🚓 TV Inspector alert! Try again!",
+      "🙈 Oops! Bye-bye telly! Try another letter!"
+    ];
+
+    let words = JSON.parse(localStorage.getItem('receptionWords')) || defaultWords;
+    let currentIndex = 0;
+    let currentLetterPos = 0;
+    let stars = 0;
+    let isWordComplete = false;
+
+    const qwertyRows = [
+      ['q','w','e','r','t','y','u','i','o','p'],
+      ['a','s','d','f','g','h','j','k','l'],
+      ['z','x','c','v','b','n','m']
+    ];
+
+    function initKeyboard() {
+      const kb = document.getElementById('keyboard');
+      kb.innerHTML = '';
+      qwertyRows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'kb-row';
+        row.forEach(letter => {
+          const btn = document.createElement('button');
+          btn.className = 'key-btn';
+          btn.textContent = letter;
+          btn.onclick = () => handleLetterInput(letter);
+          rowDiv.appendChild(btn);
+        });
+        kb.appendChild(rowDiv);
+      });
+    }
+
+    function loadWord() {
+      if (words.length === 0) {
+        words = [...defaultWords];
+      }
+
+      document.getElementById('progressBadge').textContent = `Word ${currentIndex + 1} of ${words.length}`;
+
+      const current = words[currentIndex];
+      currentLetterPos = 0;
+      isWordComplete = false;
+
+      document.getElementById('nextBtn').style.display = 'none';
+      document.getElementById('keyboard').style.display = 'flex';
+      setFeedback('', '');
+
+      const picArea = document.getElementById('pictureArea');
+      const cleanWord = current.word.trim().toLowerCase();
+
+      if (current.type === 'image') {
+        picArea.innerHTML = `<img src="${current.value}" alt="Spell this word">`;
+      } else {
+        // Automatically check images/<word>.jpg, .png, or .webp before falling back to emoji
+        const img = document.createElement('img');
+        const extensions = ['jpg', 'png', 'webp'];
+        let extIndex = 0;
+
+        img.alt = cleanWord;
+        img.src = `images/${cleanWord}.${extensions[extIndex]}`;
+
+        img.onerror = function() {
+          extIndex++;
+          if (extIndex < extensions.length) {
+            img.src = `images/${cleanWord}.${extensions[extIndex]}`;
+          } else {
+            picArea.innerHTML = `<div class="emoji-pic">${current.value}</div>`;
+          }
+        };
+
+        picArea.innerHTML = '';
+        picArea.appendChild(img);
+      }
+
+      const slotsContainer = document.getElementById('slotsContainer');
+      slotsContainer.innerHTML = '';
+      for (let i = 0; i < current.word.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'letter-slot' + (i === 0 ? ' active' : '');
+        slot.id = 'slot-' + i;
+        slotsContainer.appendChild(slot);
+      }
+    }
+
+    function triggerTvThiefAnimation(message) {
+      const thief = document.getElementById('tvThief');
+      const bubble = document.getElementById('thiefBubble');
+      bubble.textContent = message;
+
+      thief.classList.remove('run-away');
+      void thief.offsetWidth;
+      thief.classList.add('run-away');
+    }
+
+    function handleLetterInput(letter) {
+      if (isWordComplete) return;
+      if (document.getElementById('parentModal').style.display === 'flex') return;
+      if (document.getElementById('licenceModal').style.display === 'flex') return;
+      if (document.getElementById('pinModal').style.display === 'flex') return;
+
+      const cleanLetter = letter.toLowerCase();
+      const targetWord = words[currentIndex].word.toLowerCase();
+      const expectedLetter = targetWord[currentLetterPos];
+      const currentSlot = document.getElementById('slot-' + currentLetterPos);
+
+      if (cleanLetter === expectedLetter) {
+        currentSlot.textContent = cleanLetter;
+        currentSlot.classList.remove('active', 'error');
+        currentSlot.classList.add('filled');
+        setFeedback('Great job! 👍', 'feedback-success');
+        playTone(600, 0.1);
+
+        currentLetterPos++;
+
+        if (currentLetterPos >= targetWord.length) {
+          isWordComplete = true;
+          stars++;
+          document.getElementById('stars').textContent = stars;
+          document.getElementById('keyboard').style.display = 'none';
+          playWinSound();
+
+          if (currentIndex + 1 >= words.length) {
+            setFeedback(`🏆 All words finished!`, 'feedback-success');
+            setTimeout(showTvLicenceBadge, 600);
+          } else {
+            setFeedback(`🎉 Brilliant! You spelled "${targetWord}"!`, 'feedback-success');
+            document.getElementById('nextBtn').style.display = 'inline-block';
+          }
+        } else {
+          document.getElementById('slot-' + currentLetterPos).classList.add('active');
+        }
+      } else {
+        currentSlot.classList.remove('error');
+        void currentSlot.offsetWidth;
+        currentSlot.classList.add('error');
+
+        const randomIndex = Math.floor(Math.random() * funnyErrorMessages.length);
+        const msg = funnyErrorMessages[randomIndex];
+        setFeedback(`${msg} (Not "${cleanLetter}")`, 'feedback-error');
+        triggerTvThiefAnimation(msg);
+        playTone(200, 0.2);
+      }
+    }
+
+    function setFeedback(text, className) {
+      const el = document.getElementById('feedbackMsg');
+      el.textContent = text;
+      el.className = 'feedback-msg ' + className;
+    }
+
+    function nextWord() {
+      currentIndex++;
+      if (currentIndex >= words.length) {
+        currentIndex = 0;
+      }
+      loadWord();
+    }
+
+    function showTvLicenceBadge() {
+      const savedName = localStorage.getItem('receptionChildName') || '';
+      const titleEl = document.getElementById('licenceAwardTitle');
+      if (savedName.trim() !== '') {
+        titleEl.textContent = `Issued to: ${savedName.trim()} 🌟`;
+      } else {
+        titleEl.textContent = 'Super Speller Award!';
+      }
+
+      document.getElementById('totalWordsCount').textContent = words.length;
+      document.getElementById('finalStarsCount').textContent = stars;
+      document.getElementById('licenceModal').style.display = 'flex';
+      launchConfetti();
+      playFanfareSound();
+    }
+
+    function restartGame() {
+      document.getElementById('licenceModal').style.display = 'none';
+      stopConfetti();
+      currentIndex = 0;
+      loadWord();
+    }
+
+    let confettiParticles = [];
+    let confettiAnimId = null;
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ['#FF5252', '#FFD740', '#40C4FF', '#69F0AE', '#E040FB', '#FF6E40'];
+      confettiParticles = [];
+
+      for (let i = 0; i < 150; i++) {
+        confettiParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          w: Math.random() * 12 + 6,
+          h: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedY: Math.random() * 3 + 2,
+          speedX: Math.random() * 2 - 1,
+          angle: Math.random() * 360,
+          spin: Math.random() * 6 - 3
+        });
+      }
+
+      function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiParticles.forEach(p => {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.angle += p.spin;
+
+          if (p.y > canvas.height) {
+            p.y = -20;
+            p.x = Math.random() * canvas.width;
+          }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        confettiAnimId = requestAnimationFrame(animateConfetti);
+      }
+
+      animateConfetti();
+    }
+
+    function stopConfetti() {
+      if (confettiAnimId) cancelAnimationFrame(confettiAnimId);
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSlideWhistle() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(750, now);
+      osc.frequency.exponentialRampToValueAtTime(950, now + 0.12);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.85);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.9);
+    }
+
+    function playTone(freq, duration) {
+      if (freq === 200) {
+        playSlideWhistle();
+        return;
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playWinSound() {
+      setTimeout(() => playTone(523.25, 0.15), 0);
+      setTimeout(() => playTone(659.25, 0.15), 120);
+      setTimeout(() => playTone(783.99, 0.3), 240);
+    }
+
+    function playFanfareSound() {
+      setTimeout(() => playTone(523.25, 0.12), 0);
+      setTimeout(() => playTone(659.25, 0.12), 120);
+      setTimeout(() => playTone(783.99, 0.12), 240);
+      setTimeout(() => playTone(1046.50, 0.45), 360);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('parentModal').style.display === 'flex') return;
+      if (document.getElementById('licenceModal').style.display === 'flex') return;
+      if (document.getElementById('pinModal').style.display === 'flex') return;
+      if (isWordComplete && e.key === 'Enter') {
+        nextWord();
+        return;
+      }
+      if (/^[a-zA-Z]$/.test(e.key)) {
+        handleLetterInput(e.key);
+      }
+    });
+
+    let enteredPin = '';
+
+    function requestParentAccess() {
+      enteredPin = '';
+      updatePinDisplay();
+      document.getElementById('pinErrorMsg').textContent = '';
+      document.getElementById('pinModal').style.display = 'flex';
+    }
+
+    function closePinModal() {
+      document.getElementById('pinModal').style.display = 'none';
+    }
+
+    function clearPin() {
+      enteredPin = '';
+      updatePinDisplay();
+      document.getElementById('pinErrorMsg').textContent = '';
+    }
+
+    function updatePinDisplay() {
+      const starsStr = '●'.repeat(enteredPin.length);
+      const blanksStr = '_'.repeat(4 - enteredPin.length);
+      document.getElementById('pinDisplay').textContent = starsStr + blanksStr;
+    }
+
+    function pressPinDigit(digit) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += digit;
+      updatePinDisplay();
+
+      if (enteredPin.length === 4) {
+        const savedPin = localStorage.getItem('receptionParentPin') || '1234';
+        if (enteredPin === savedPin) {
+          closePinModal();
+          openParentModal();
+        } else {
+          document.getElementById('pinErrorMsg').textContent = 'Wrong PIN! Try again.';
+          setTimeout(clearPin, 700);
+        }
+      }
+    }
+
+    function openParentModal() {
+      document.getElementById('childNameInput').value = localStorage.getItem('receptionChildName') || '';
+      document.getElementById('parentPinInput').value = localStorage.getItem('receptionParentPin') || '1234';
+      renderWordList();
+      document.getElementById('parentModal').style.display = 'flex';
+    }
+
+    function closeParentModal() {
+      const nameVal = document.getElementById('childNameInput').value.trim();
+      localStorage.setItem('receptionChildName', nameVal);
+
+      const newPin = document.getElementById('parentPinInput').value.trim();
+      if (/^\d{4}$/.test(newPin)) {
+        localStorage.setItem('receptionParentPin', newPin);
+      } else {
+        alert('PIN must be 4 digits. Keeping previous PIN.');
+      }
+
+      document.getElementById('parentModal').style.display = 'none';
+      currentIndex = 0;
+      loadWord();
+    }
+
+    const rwiBooksLibrary = {
+      book1: [
+        { word: "mat", type: "emoji", value: "🧘" },
+        { word: "sad", type: "emoji", value: "😢" },
+        { word: "sat", type: "emoji", value: "🪑" },
+        { word: "dad", type: "emoji", value: "👨" },
+        { word: "mad", type: "emoji", value: "😠" },
+        { word: "pin", type: "emoji", value: "📍" },
+        { word: "pan", type: "emoji", value: "🍳" },
+        { word: "tip", type: "emoji", value: "🗑️" },
+        { word: "sit", type: "emoji", value: "🧎" },
+        { word: "top", type: "emoji", value: "👕" },
+        { word: "dog", type: "emoji", value: "🐶" },
+        { word: "pop", type: "emoji", value: "🎈" },
+        { word: "pot", type: "emoji", value: "🍯" },
+        { word: "dig", type: "emoji", value: "🪏" },
+        { word: "gap", type: "emoji", value: "🕳️" }
+      ],
+      book2: [
+        { word: "cat", type: "emoji", value: "🐱" },
+        { word: "can", type: "emoji", value: "🥫" },
+        { word: "cap", type: "emoji", value: "🧢" },
+        { word: "cot", type: "emoji", value: "👶" },
+        { word: "cup", type: "emoji", value: "🥤" },
+        { word: "cub", type: "emoji", value: "🐻" },
+        { word: "kit", type: "emoji", value: "🧰" },
+        { word: "mud", type: "emoji", value: "🟤" },
+        { word: "mug", type: "emoji", value: "☕" },
+        { word: "up", type: "emoji", value: "⬆️" },
+        { word: "bad", type: "emoji", value: "👎" },
+        { word: "bin", type: "emoji", value: "🗑️" },
+        { word: "bat", type: "emoji", value: "🦇" },
+        { word: "bug", type: "emoji", value: "🐛" }
+      ],
+      book3: [
+        { word: "fan", type: "emoji", value: "🪭" },
+        { word: "fat", type: "emoji", value: "🦛" },
+        { word: "fin", type: "emoji", value: "🦈" },
+        { word: "fun", type: "emoji", value: "🥳" },
+        { word: "bed", type: "emoji", value: "🛏️" },
+        { word: "get", type: "emoji", value: "🤲" },
+        { word: "met", type: "emoji", value: "🤝" },
+        { word: "net", type: "emoji", value: "🥅" },
+        { word: "pen", type: "emoji", value: "🖊️" },
+        { word: "ten", type: "emoji", value: "🔟" },
+        { word: "leg", type: "emoji", value: "🦵" },
+        { word: "lip", type: "emoji", value: "👄" },
+        { word: "log", type: "emoji", value: "🪵" },
+        { word: "hat", type: "emoji", value: "🎩" },
+        { word: "hen", type: "emoji", value: "🐔" },
+        { word: "hit", type: "emoji", value: "🏏" },
+        { word: "hop", type: "emoji", value: "🐇" },
+        { word: "hot", type: "emoji", value: "🥵" }
+
+],
+book4: [
+{ word: "rat", type: "emoji", value: "🐀" },
+{ word: "red", type: "emoji", value: "🔴" },
+{ word: "rip", type: "emoji", value: "📄" },
+{ word: "rug", type: "emoji", value: "🧶" },
+{ word: "run", type: "emoji", value: "🏃" },
+{ word: "jam", type: "emoji", value: "🍓" },
+{ word: "jet", type: "emoji", value: "✈️" },
+{ word: "jog", type: "emoji", value: "🏃‍♂️" },
+{ word: "jug", type: "emoji", value: "🫗" },
+{ word: "van", type: "emoji", value: "🚐" },
+{ word: "vet", type: "emoji", value: "🩺" },
+{ word: "yap", type: "emoji", value: "🐕" },
+{ word: "yes", type: "emoji", value: "✅" },
+{ word: "yet", type: "emoji", value: "⏳" },
+{ word: "web", type: "emoji", value: "🕸️" },
+{ word: "wet", type: "emoji", value: "💦" },
+{ word: "win", type: "emoji", value: "🏆" },
+{ word: "wish", type: "emoji", value: "🌠" }
+],
+book5: [
+{ word: "zag", type: "emoji", value: "⚡" },
+{ word: "zip", type: "emoji", value: "🤐" },
+{ word: "box", type: "emoji", value: "📦" },
+{ word: "fox", type: "emoji", value: "🦊" },
+{ word: "fix", type: "emoji", value: "🔧" },
+{ word: "six", type: "emoji", value: "6️⃣" },
+{ word: "well", type: "emoji", value: "🪣" },
+{ word: "bell", type: "emoji", value: "🔔" },
+{ word: "hill", type: "emoji", value: "⛰️" },
+{ word: "hiss", type: "emoji", value: "🐍" },
+{ word: "mess", type: "emoji", value: "🧸" },
+{ word: "buzz", type: "emoji", value: "🐝" }
+],
+book6: [
+{ word: "ship", type: "emoji", value: "🚢" },
+{ word: "shop", type: "emoji", value: "🏪" },
+{ word: "shed", type: "emoji", value: "🏚️" },
+{ word: "shell", type: "emoji", value: "🐚" },
+{ word: "fish", type: "emoji", value: "🐟" },
+{ word: "wish", type: "emoji", value: "🌠" },
+{ word: "dish", type: "emoji", value: "🍽️" },
+{ word: "duck", type: "emoji", value: "🦆" },
+{ word: "sack", type: "emoji", value: "💰" },
+{ word: "sock", type: "emoji", value: "🧦" },
+{ word: "lock", type: "emoji", value: "🔒" },
+{ word: "rock", type: "emoji", value: "🪨" },
+{ word: "neck", type: "emoji", value: "🦒" }
+],
+
+
+      book7: [
+        { word: "thin", type: "emoji", value: "📏" },
+        { word: "thick", type: "emoji", value: "📕" },
+        { word: "moth", type: "emoji", value: "🦋" },
+        { word: "bath", type: "emoji", value: "🛁" },
+        { word: "path", type: "emoji", value: "🛤️" },
+        { word: "chin", type: "emoji", value: "🧔" },
+        { word: "chop", type: "emoji", value: "🪓" },
+        { word: "chat", type: "emoji", value: "💬" },
+        { word: "chip", type: "emoji", value: "🍟" },
+        { word: "king", type: "emoji", value: "👑" },
+        { word: "ring", type: "emoji", value: "💍" },
+        { word: "sing", type: "emoji", value: "🎤" },
+        { word: "wing", type: "emoji", value: "🪽" },
+        { word: "bang", type: "emoji", value: "💥" },
+        { word: "pink", type: "emoji", value: "🩷" },
+        { word: "sink", type: "emoji", value: "🚰" },
+        { word: "wink", type: "emoji", value: "😉" },
+        { word: "tank", type: "emoji", value: "🐠" }
+      ],
+      book8: [
+        { word: "swim", type: "emoji", value: "🏊" },
+        { word: "skip", type: "emoji", value: "🪢" },
+        { word: "snap", type: "emoji", value: "🐊" },
+        { word: "spin", type: "emoji", value: "🌀" },
+        { word: "spot", type: "emoji", value: "🐞" },
+        { word: "step", type: "emoji", value: "🪜" },
+        { word: "stop", type: "emoji", value: "🛑" },
+        { word: "trip", type: "emoji", value: "🧳" },
+        { word: "trap", type: "emoji", value: "🪤" },
+        { word: "frog", type: "emoji", value: "🐸" },
+        { word: "flag", type: "emoji", value: "🚩" },
+        { word: "flap", type: "emoji", value: "🦅" },
+        { word: "drum", type: "emoji", value: "🥁" },
+        { word: "drip", type: "emoji", value: "💧" },
+        { word: "drop", type: "emoji", value: "💦" },
+        { word: "grin", type: "emoji", value: "😁" },
+        { word: "pram", type: "emoji", value: "👶" },
+        { word: "crab", type: "emoji", value: "🦀" },
+        { word: "clap", type: "emoji", value: "👏" }
+      ],
+      book9: [
+        { word: "milk", type: "emoji", value: "🥛" },
+        { word: "mist", type: "emoji", value: "🌫️" },
+        { word: "mask", type: "emoji", value: "🎭" },
+        { word: "mend", type: "emoji", value: "🧵" },
+        { word: "melt", type: "emoji", value: "🫠" },
+        { word: "sand", type: "emoji", value: "🏖️" },
+        { word: "hand", type: "emoji", value: "✋" },
+        { word: "band", type: "emoji", value: "🎸" },
+        { word: "land", type: "emoji", value: "🏝️" },
+        { word: "pond", type: "emoji", value: "🦆" },
+        { word: "vest", type: "emoji", value: "🎽" },
+        { word: "nest", type: "emoji", value: "🪹" },
+        { word: "best", type: "emoji", value: "🥇" },
+        { word: "tent", type: "emoji", value: "⛺" },
+        { word: "belt", type: "emoji", value: "🥋" },
+        { word: "jump", type: "emoji", value: "🦘" },
+        { word: "bump", type: "emoji", value: "🤕" },
+        { word: "lump", type: "emoji", value: "🥔" },
+        { word: "lamp", type: "emoji", value: "🪔" },
+        { word: "camp", type: "emoji", value: "🏕️" }
+      ],
+      book10: [
+        { word: "chimp", type: "emoji", value: "🐵" },
+        { word: "chick", type: "emoji", value: "🐥" },
+        { word: "clock", type: "emoji", value: "⏰" },
+        { word: "dress", type: "emoji", value: "👗" },
+        { word: "press", type: "emoji", value: "🔘" },
+        { word: "spill", type: "emoji", value: "🫗" },
+        { word: "smell", type: "emoji", value: "👃" },
+        { word: "shock", type: "emoji", value: "😱" },
+        { word: "smash", type: "emoji", value: "🔨" },
+        { word: "crash", type: "emoji", value: "💥" },
+        { word: "brush", type: "emoji", value: "🖌️" },
+        { word: "fresh", type: "emoji", value: "🥗" }
+      ],
+      specialFriends: [
+        { word: "ship", type: "emoji", value: "🚢" },
+        { word: "fish", type: "emoji", value: "🐟" },
+        { word: "chip", type: "emoji", value: "🍟" },
+        { word: "moth", type: "emoji", value: "🦋" },
+        { word: "ring", type: "emoji", value: "💍" },
+        { word: "wing", type: "emoji", value: "🪽" },
+        { word: "pink", type: "emoji", value: "🩷" },
+        { word: "duck", type: "emoji", value: "🦆" }
+      ],
+      set2Vowels: [
+        { word: "play", type: "emoji", value: "🛝" },
+        { word: "tray", type: "emoji", value: "🍱" },
+        { word: "tree", type: "emoji", value: "🌳" },
+        { word: "green", type: "emoji", value: "🟢" },
+        { word: "night", type: "emoji", value: "🌃" },
+        { word: "snow", type: "emoji", value: "❄️" },
+        { word: "moon", type: "emoji", value: "🌙" },
+        { word: "book", type: "emoji", value: "📖" }
+      ],
+      redWords: [
+        { word: "the", type: "emoji", value: "🛑" },
+        { word: "said", type: "emoji", value: "💬" },
+        { word: "you", type: "emoji", value: "👉" },
+        { word: "was", type: "emoji", value: "⏪" },
+        { word: "my", type: "emoji", value: "🙋‍♂️" },
+        { word: "are", type: "emoji", value: "👥" }
+      ]
+    };
+
+    function loadSelectedRwiBook() {
+      const selectedKey = document.getElementById('rwiBookSelect').value;
+      const selectedWords = rwiBooksLibrary[selectedKey];
+      if (selectedWords) {
+        words = [...selectedWords];
+        localStorage.setItem('receptionWords', JSON.stringify(words));
+        renderWordList();
+        const bookLabel = document.getElementById('rwiBookSelect').selectedOptions[0].text;
+        alert(`✅ Loaded ${selectedWords.length} words from ${bookLabel}!`);
+      }
+    }
+
+    function clearAllWords() {
+      if (confirm('Remove all words from the current list?')) {
+        words = [];
+        localStorage.setItem('receptionWords', JSON.stringify(words));
+        renderWordList();
+      }
+    }
+
+    function renderWordList() {
+      const container = document.getElementById('wordListContainer');
+      container.innerHTML = '';
+      if (words.length === 0) {
+        container.innerHTML = '<p style="color: #888; font-size: 0.9rem;">List is empty. Select a book above or add custom words!</p>';
+        return;
+      }
+      words.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'word-list-item';
+        const preview = item.type === 'emoji' ? item.value : '🖼️ Photo';
+        div.innerHTML = `
+          <span><strong>${item.word}</strong> (${preview})</span>
+          <button class="del-btn" onclick="deleteWord(${index})">Remove</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addNewWord() {
+      const wordInput = document.getElementById('newWordInput').value.trim().toLowerCase();
+      const emojiInput = document.getElementById('newEmojiInput').value.trim();
+      const imageInput = document.getElementById('newImageInput');
+
+      if (!wordInput) {
+        alert('Please enter a word first.');
+        return;
+      }
+
+      if (imageInput.files && imageInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          words.push({ word: wordInput, type: 'image', value: e.target.result });
+          saveAndResetForm();
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+      } else if (emojiInput) {
+        words.push({ word: wordInput, type: 'emoji', value: emojiInput });
+        saveAndResetForm();
+      } else {
+        alert('Please enter an emoji or choose a picture file.');
+      }
+    }
+
+    function saveAndResetForm() {
+      localStorage.setItem('receptionWords', JSON.stringify(words));
+      document.getElementById('newWordInput').value = '';
+      document.getElementById('newEmojiInput').value = '';
+      document.getElementById('newImageInput').value = '';
+      renderWordList();
+    }
+
+    function deleteWord(index) {
+      words.splice(index, 1);
+      localStorage.setItem('receptionWords', JSON.stringify(words));
+      renderWordList();
+    }
+
+    initKeyboard();
+    loadWord();
+  </script>
+</body>
+</html>
