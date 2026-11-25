@@ -446,13 +446,15 @@
     <button class="parent-btn" onclick="requestParentAccess()">🔒 Parent Setup</button>
   </header>
 
-  <div class="game-card">
+    <div class="game-card">
     <div class="picture-area" id="pictureArea"></div>
+    <button class="speak-btn" onclick="speakCurrentWord()">🔊 Hear Word</button>
     <div class="slots-container" id="slotsContainer"></div>
     <div class="feedback-msg" id="feedbackMsg"></div>
     <button class="next-btn" id="nextBtn" onclick="nextWord()">Next Word ➡️</button>
     <div class="keyboard" id="keyboard"></div>
   </div>
+
 
   <!-- Cartoon TV Thief Animation Character -->
   <div class="tv-thief-overlay" id="tvThief">
@@ -613,7 +615,18 @@
       });
     }
 
+    function speakCurrentWord() {
+      if (!('speechSynthesis' in window) || words.length === 0) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(words[currentIndex].word);
+      utterance.lang = 'en-GB';
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
+
     function loadWord() {
+
+
       if (words.length === 0) {
         words = [...defaultWords];
       }
@@ -1243,8 +1256,7 @@ book6: [
       localStorage.setItem('receptionWords', JSON.stringify(words));
       renderWordList();
     }
-
-    initKeyboard();
+       initKeyboard();
     loadWord();
   </script>
 </body>
