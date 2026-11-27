@@ -1264,6 +1264,13 @@ book6: [
     }
        initKeyboard();
     loadWord();
+ 
+    
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+  }
+</script>
+
   </script>
 </body>
 </html>
