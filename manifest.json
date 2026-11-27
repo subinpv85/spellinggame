@@ -1,0 +1,15 @@
+{
+  "name": "Kids Spelling Challenge",
+  "short_name": "Spelling",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
